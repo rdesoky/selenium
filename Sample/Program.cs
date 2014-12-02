@@ -22,7 +22,8 @@ namespace Sample
 			DesiredCapabilities ie = DesiredCapabilities.InternetExplorer();
 			ie.SetCapability("browserAttachTimeout", 300000);
 			ie.SetCapability("initialBrowserUrl", "http://www.google.com");
-			ie.SetCapability("ie.forceCreateProcessApi", true);
+			ie.SetCapability("ie.location", "C:\\Users\\Ramy\\Projects\\LamPOC\\build\\Win32\\Debug\\McUICnt.exe");
+			//ie.SetCapability("ie.forceCreateProcessApi", true); // It is default in our fork
 			//ie.SetCapability("ie.forceShellWindowsApi",true);
 
             //IWebDriver driver = new InternetExplorerDriver();
@@ -36,7 +37,8 @@ namespace Sample
 			//query.SendKeys("Cheese");
 			//query.Submit();
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromMinutes(30));
-			wait.Until((d) => { return d.Title.ToLower().StartsWith("about"); });
+			//wait.Until((d) => { return d.Title.ToLower().StartsWith("about"); });
+			wait.Until((d) => { return d.FindElement(By.Id("SettingsPanel")); });
 			//System.Console.WriteLine("Page title is: " + driver.Title);
 			//Thread.Sleep(TimeSpan.FromSeconds(10));
             driver.Quit();

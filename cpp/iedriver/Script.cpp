@@ -480,10 +480,11 @@ bool Script::CreateAnonymousFunction(VARIANT* result) {
     LOGHR(WARN, hr) << "Unable to get parent window, call to IHTMLDocument2::get_parentWindow failed";
     return false;
   }
-
+  //LAM: General Access Denied Error ( could be protected mode )
   hr = window->execScript(code, lang, &exec_script_result);
   if (FAILED(hr)) {
     LOGHR(WARN, hr) << "Unable to execute code, call to IHTMLWindow2::execScript failed";
+	LOG(ERROR) << "Unable to execute code, call to IHTMLWindow2::execScript failed";
     return false;
   }
 

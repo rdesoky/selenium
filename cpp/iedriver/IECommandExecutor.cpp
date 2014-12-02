@@ -534,6 +534,7 @@ void IECommandExecutor::DispatchCommand() {
 }
 
 bool IECommandExecutor::IsAlertActive(BrowserHandle browser, HWND* alert_handle) {
+	return false;//LAM: temporarly because LAM main window is created as WS_DIALOG
   LOG(TRACE) << "Entering IECommandExecutor::IsAlertActive";
   HWND dialog_handle = browser->GetActiveDialogWindowHandle();
   if (dialog_handle != NULL) {

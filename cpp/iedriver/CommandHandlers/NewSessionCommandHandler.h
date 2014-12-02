@@ -46,7 +46,7 @@ class NewSessionCommandHandler : public IECommandHandler {
       factory_settings.browser_attach_timeout = browser_attach_timeout.asInt();
       Json::Value initial_url = this->GetCapability(it->second, INITIAL_BROWSER_URL_CAPABILITY, Json::stringValue, default_initial_url);
       factory_settings.initial_browser_url = initial_url.asString();
-      Json::Value force_create_process_api = this->GetCapability(it->second, FORCE_CREATE_PROCESS_API_CAPABILITY, Json::booleanValue, false);
+      Json::Value force_create_process_api = this->GetCapability(it->second, FORCE_CREATE_PROCESS_API_CAPABILITY, Json::booleanValue, true);//LAM: make it default
       factory_settings.force_create_process_api = force_create_process_api.asBool();
       Json::Value force_shell_windows_api = this->GetCapability(it->second, FORCE_SHELL_WINDOWS_API_CAPABILITY, Json::booleanValue, false);
       factory_settings.force_shell_windows_api = force_shell_windows_api.asBool();
@@ -54,6 +54,8 @@ class NewSessionCommandHandler : public IECommandHandler {
       factory_settings.browser_command_line_switches = browser_command_line_switches.asString();
       Json::Value ensure_clean_session = this->GetCapability(it->second, ENSURE_CLEAN_SESSION_CAPABILITY, Json::booleanValue, false);
       factory_settings.clear_cache_before_launch = ensure_clean_session.asBool();
+
+	  factory_settings.ie_location = this->GetCapability(it->second, IE_LOCATION, Json::stringValue, "").asString();//LAM
       mutable_executor.browser_factory()->Initialize(factory_settings);
 
       Json::Value enable_native_events = this->GetCapability(it->second, NATIVE_EVENTS_CAPABILITY, Json::booleanValue, true);

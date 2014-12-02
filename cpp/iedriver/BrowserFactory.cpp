@@ -50,6 +50,7 @@ void BrowserFactory::Initialize(BrowserFactorySettings settings) {
   this->clear_cache_ = settings.clear_cache_before_launch;
   this->browser_command_line_switches_ = StringUtilities::ToWString(settings.browser_command_line_switches);
   this->initial_browser_url_ = StringUtilities::ToWString(settings.initial_browser_url);
+  this->ie_executable_location_ = StringUtilities::ToWString(settings.ie_location);
 
   this->html_getobject_msg_ = ::RegisterWindowMessage(HTML_GETOBJECT_MSG);
 
@@ -191,6 +192,7 @@ void BrowserFactory::LaunchBrowserUsingIELaunchURL(PROCESS_INFORMATION* proc_inf
 }
 
 bool BrowserFactory::IsCreateProcessApiAvailable() {
+	return true;//LAM: not required for Webview apps
   LOG(TRACE) << "Entering BrowserFactory::IsCreateProcessApiAvailable";
   if (this->ie_major_version_ >= 8) {
     // According to http://blogs.msdn.com/b/askie/archive/2009/03/09/opening-a-new-tab-may-launch-a-new-process-with-internet-explorer-8-0.aspx
@@ -272,7 +274,7 @@ bool BrowserFactory::GetDocumentFromWindowHandle(HWND window_handle,
 	
     LPFNOBJECTFROMLRESULT object_pointer = reinterpret_cast<LPFNOBJECTFROMLRESULT>(::GetProcAddress(this->oleacc_instance_handle_, "ObjectFromLresult"));
     if (object_pointer != NULL) {
-      HRESULT hr;//TODO: ObjectFromLresult() is failing to convert WM_HTML_GETOBJECT returned value to IHTMLDocument2
+      HRESULT hr;//LAM: With WSS ObjectFromLresult() is failing to convert WM_HTML_GETOBJECT returned value to IHTMLDocument2
       hr = (*object_pointer)(result,
                              IID_IHTMLDocument2,
                              0,
@@ -801,7 +803,7 @@ void BrowserFactory::InvokeClearCacheUtility(bool use_low_integrity_level) {
     }
   }
 }
-//TODO: update to find McUICnt.exe
+//LAM: update to find McUICnt.exe
 BOOL CALLBACK BrowserFactory::FindBrowserWindow(HWND hwnd, LPARAM arg) {
   // Could this be an IE instance?
   // 8 == "IeFrame\0"
@@ -815,7 +817,8 @@ BOOL CALLBACK BrowserFactory::FindBrowserWindow(HWND hwnd, LPARAM arg) {
 
   if (strcmp(IE_FRAME_WINDOW_CLASS, name) != 0 && 
       strcmp(SHELL_DOCOBJECT_VIEW_WINDOW_CLASS, name) != 0 && 
-	  strcmp("AB80AD1E41A445efAB585BDC60B29776", name) != 0) {
+	  strcmp("AB80AD1E41A445efAB585BDC60B29776", name) != 0 && //WSS
+	  strcmp("#32770", name) != 0 ){ //LAM
     return TRUE;
   }
 
@@ -891,11 +894,13 @@ BOOL CALLBACK BrowserFactory::FindDialogWindowForProcess(HWND hwnd, LPARAM arg) 
 
   return TRUE;
 }
-//TODO: use setCapabilitiy() to force executable ( or registry ) location
+//LAM: use setCapabilitiy() to force executable ( or registry ) location
 void BrowserFactory::GetExecutableLocation() {
   LOG(TRACE) << "Entering BrowserFactory::GetExecutableLocation";
-  this->ie_executable_location_ = L"C:\\Program Files\\Common Files\\McAfee\\Platform\\McUICnt.exe";
-  return;//TODO: temp solution
+
+  if (this->ie_executable_location_.length()){//LAM: read from capabilites
+	return;
+  }
   std::wstring class_id;
   if (RegistryUtilities::GetRegistryValue(HKEY_LOCAL_MACHINE,
                                           IE_CLSID_REGISTRY_KEY,

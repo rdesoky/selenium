@@ -92,6 +92,7 @@ struct BrowserFactorySettings {
   int browser_attach_timeout;
   std::string initial_browser_url;
   std::string browser_command_line_switches;
+  std::string ie_location;//LAM: new
 };
 
 class BrowserFactory {
