@@ -891,11 +891,11 @@ BOOL CALLBACK BrowserFactory::FindDialogWindowForProcess(HWND hwnd, LPARAM arg) 
 
   return TRUE;
 }
-//TODO: update to execute McUICnt.exe
+//TODO: use setCapabilitiy() to force executable ( or registry ) location
 void BrowserFactory::GetExecutableLocation() {
   LOG(TRACE) << "Entering BrowserFactory::GetExecutableLocation";
   this->ie_executable_location_ = L"C:\\Program Files\\Common Files\\McAfee\\Platform\\McUICnt.exe";
-  return;
+  return;//TODO: temp solution
   std::wstring class_id;
   if (RegistryUtilities::GetRegistryValue(HKEY_LOCAL_MACHINE,
                                           IE_CLSID_REGISTRY_KEY,
