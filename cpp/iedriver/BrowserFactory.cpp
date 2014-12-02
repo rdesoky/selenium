@@ -51,6 +51,9 @@ void BrowserFactory::Initialize(BrowserFactorySettings settings) {
   this->browser_command_line_switches_ = StringUtilities::ToWString(settings.browser_command_line_switches);
   this->initial_browser_url_ = StringUtilities::ToWString(settings.initial_browser_url);
   this->ie_executable_location_ = StringUtilities::ToWString(settings.ie_location);
+  if (!this->ie_executable_location_.length()){
+	  GetExecutableLocation();
+  }
 
   this->html_getobject_msg_ = ::RegisterWindowMessage(HTML_GETOBJECT_MSG);
 
@@ -894,7 +897,7 @@ BOOL CALLBACK BrowserFactory::FindDialogWindowForProcess(HWND hwnd, LPARAM arg) 
 
   return TRUE;
 }
-//LAM: use setCapabilitiy() to force executable ( or registry ) location
+
 void BrowserFactory::GetExecutableLocation() {
   LOG(TRACE) << "Entering BrowserFactory::GetExecutableLocation";
 
