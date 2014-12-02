@@ -269,10 +269,10 @@ bool BrowserFactory::GetDocumentFromWindowHandle(HWND window_handle,
                          SMTO_ABORTIFHUNG,
                          1000,
                          reinterpret_cast<PDWORD_PTR>(&result));
-
+	
     LPFNOBJECTFROMLRESULT object_pointer = reinterpret_cast<LPFNOBJECTFROMLRESULT>(::GetProcAddress(this->oleacc_instance_handle_, "ObjectFromLresult"));
     if (object_pointer != NULL) {
-      HRESULT hr;
+      HRESULT hr;//TODO: ObjectFromLresult() is failing to convert WM_HTML_GETOBJECT returned value to IHTMLDocument2
       hr = (*object_pointer)(result,
                              IID_IHTMLDocument2,
                              0,
@@ -801,19 +801,21 @@ void BrowserFactory::InvokeClearCacheUtility(bool use_low_integrity_level) {
     }
   }
 }
-
+//TODO: update to find McUICnt.exe
 BOOL CALLBACK BrowserFactory::FindBrowserWindow(HWND hwnd, LPARAM arg) {
   // Could this be an IE instance?
   // 8 == "IeFrame\0"
   // 21 == "Shell DocObject View\0";
-  char name[21];
-  if (::GetClassNameA(hwnd, name, 21) == 0) {
+  // 33 == "AB80AD1E41A445efAB585BDC60B29776\0"
+  char name[40];
+  if (::GetClassNameA(hwnd, name, 36) == 0) {
     // No match found. Skip
     return TRUE;
   }
 
   if (strcmp(IE_FRAME_WINDOW_CLASS, name) != 0 && 
-      strcmp(SHELL_DOCOBJECT_VIEW_WINDOW_CLASS, name) != 0) {
+      strcmp(SHELL_DOCOBJECT_VIEW_WINDOW_CLASS, name) != 0 && 
+	  strcmp("AB80AD1E41A445efAB585BDC60B29776", name) != 0) {
     return TRUE;
   }
 
@@ -836,7 +838,7 @@ BOOL CALLBACK BrowserFactory::FindChildWindowForProcess(HWND hwnd, LPARAM arg) {
   } else {
     DWORD process_id = NULL;
     ::GetWindowThreadProcessId(hwnd, &process_id);
-    if (process_window_info->dwProcessId == process_id) {
+    if (true){//(process_window_info->dwProcessId == process_id) {
       // Once we've found the first Internet Explorer_Server window
       // for the process we want, we can stop.
       process_window_info->hwndBrowser = hwnd;
@@ -889,10 +891,11 @@ BOOL CALLBACK BrowserFactory::FindDialogWindowForProcess(HWND hwnd, LPARAM arg) 
 
   return TRUE;
 }
-
+//TODO: update to execute McUICnt.exe
 void BrowserFactory::GetExecutableLocation() {
   LOG(TRACE) << "Entering BrowserFactory::GetExecutableLocation";
-
+  this->ie_executable_location_ = L"C:\\Program Files\\Common Files\\McAfee\\Platform\\McUICnt.exe";
+  return;
   std::wstring class_id;
   if (RegistryUtilities::GetRegistryValue(HKEY_LOCAL_MACHINE,
                                           IE_CLSID_REGISTRY_KEY,
